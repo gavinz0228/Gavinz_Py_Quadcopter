@@ -2,21 +2,70 @@ from RPIO import PWM
 from mpu import *
 import RPi.GPIO as GPIO
 import time
+import math
+import datetime
 #GPIO.setmode(GPIO.BCM)
-pin=17
+leftPin=17
+rightPin=22
 max=2000
 min=1000
-motor=PWM.Servo()
-baseSpeed=1200
+servo=PWM.Servo()
+PWM.set_loglevel(PWM.LOG_LEVEL_ERRORS)
+baseSpeed=1300
+lastTime=None
+pidX=0
+pidY=0
+lastX=0
+lastY=0
+angleX=0
+angleY=0
+kpX=1
+kiX=1
+kdX=1
+kpY=1.5
+kiY=1.5
+kdY=1.5
 def run():
 	init()
 	while True:
-		addSpeed=getX()*10
-		speed=baseSpeed+addSpeed
-		setSpeed(pin,speed)
-		time.sleep(0.1)
+		pidX,pidY=calculate(0,0)
+		print("PID-Y:"+str(pidY))
+		#ySpeed=getTransY()*10
+		setSpeed(leftPin,baseSpeed-transform(pidY))
+		#time.sleep(0.1)
+		setSpeed(rightPin,baseSpeed+transform(pidY))
+		time.sleep(0.02)
+def calculate(goalX,goalY):
+	global lastTime
+	global lastX
+	global lastY
+	global angleX
+	global angleY
+	if not lastTime:
+		lastTime=time.time()
+		lastX=getX()
+		lastY=getY()
+		return 0,0
+	interval=time.time()-lastTime
+	gx,gy,gz=get_gyro_rate()
+	acX=getX()
+	acY=getY()
+	angleX=0.98*(angleX+gx*(interval/1000.0))+0.02*acX
+	angleY=0.98*(angleY+gy*(interval)/1000.0)+0.02*acY
+	#angleY+=gy*(interval/1000.0)
+	print("Angle X:"+str(angleX))
+	
+	pidX=kpX*(goalX-acX)+kiX*(lastX-acX)*interval+kdX*(lastX-acX)/interval
+	#pidY=kpY*(goalY-acY)+kiY*(lastY-acY)*interval+kdY*(lastY-acY)/interval
+	pidY=kpY*(goalY-angleY)+kiY*(lastY-angleY)*interval+kdY*(lastY-angleY)/interval
+	
+	lastTime=time.time()
+	return pidX,pidY
+def transform(value):
+	return value/math.cos(math.radians(45))
 def init():
-	setSpeed(pin,min)
+	setSpeed(leftPin,min)
+	setSpeed(rightPin,min)
 	time.sleep(2)
 def setSpeed(pin,speed):
 	speed=int(speed)
@@ -25,7 +74,7 @@ def setSpeed(pin,speed):
 	elif speed<min:
 		speed=min
 	speed=speed/10*10
-	motor.set_servo(pin,int(speed))	
+	servo.set_servo(pin,int(speed))	
 if __name__=="__main__":
 	#calibrate()
 	run()

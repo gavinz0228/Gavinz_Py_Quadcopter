@@ -2,7 +2,7 @@ from RPIO import PWM
 import RPi.GPIO as GPIO
 import time
 #GPIO.setmode(GPIO.BCM)
-pin=17
+pin=22
 max=2000
 min=1000
 servo=PWM.Servo()
@@ -23,5 +23,5 @@ def run():
 		print('yay')
 		time.sleep(1)
 if __name__=="__main__":
-	#calibrate()
-	run()
+	calibrate()
+	#run()

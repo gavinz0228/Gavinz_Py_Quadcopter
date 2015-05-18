@@ -23,6 +23,11 @@ def read_word_2c(adr):
         return val
 def dist(a,b):
     return math.sqrt((a*a)+(b*b))
+def get_gyro_rate():
+    x=read_word_2c(0x43)
+    y=read_word_2c(0x45)
+    z=read_word_2c(0x47)
+    return x/131.0,y/131.0,z/131.0
 def get_y_rotation(x,y,z):
     radians = math.atan2(x, dist(y,z))
     return -math.degrees(radians)
