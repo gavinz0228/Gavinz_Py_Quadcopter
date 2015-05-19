@@ -36,11 +36,11 @@ def get_x_rotation(x,y,z):
     return math.degrees(radians)
 def init():
 	pass	
-def getX():
+def get_acc():
 	ax=read_word_2c(0x3b)/16384.0
 	ay=read_word_2c(0x3d)/16384.0
 	az=read_word_2c(0x3f)/16384.0
-	return get_x_rotation(ax,ay,az) 
+	return get_x_rotation(ax,ay,az),get_y_rotation(ax,ay,az) 
 def getY():
 	ax=read_word_2c(0x3b)/16384.0
 	ay=read_word_2c(0x3d)/16384.0

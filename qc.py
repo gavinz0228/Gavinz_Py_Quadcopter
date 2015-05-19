@@ -15,9 +15,9 @@ baseSpeed=1300
 lastTime=None
 pidX=0
 pidY=0
-lastX=0
-lastY=0
 angleX=0
+lastAngleX=0
+lastAngleY=0
 angleY=0
 kpX=1
 kiX=1
@@ -37,28 +37,26 @@ def run():
 		time.sleep(0.02)
 def calculate(goalX,goalY):
 	global lastTime
-	global lastX
-	global lastY
 	global angleX
 	global angleY
+	global lastAngleX
+	global lastAngleY
 	if not lastTime:
 		lastTime=time.time()
-		lastX=getX()
-		lastY=getY()
 		return 0,0
 	interval=time.time()-lastTime
 	gx,gy,gz=get_gyro_rate()
-	acX=getX()
-	acY=getY()
+	acX,acY=get_acc()
 	angleX=0.98*(angleX+gx*interval)+0.02*acX
 	angleY=0.98*(angleY+gy*interval)+0.02*acY
 	#angleY+=gy*(interval/1000.0)
 	print("Angle Y:"+str(transform(angleY)))
 	
-	pidX=kpX*(goalX-acX)+kiX*(lastX-acX)*interval+kdX*(lastX-acX)/interval
+	#pidX=kpX*(goalX-acX)+kiX*(lastX-acX)*interval+kdX*(lastX-acX)/interval
 	#pidY=kpY*(goalY-acY)+kiY*(lastY-acY)*interval+kdY*(lastY-acY)/interval
-	pidY=kpY*(goalY-angleY)+kiY*(lastY-angleY)*interval+kdY*(lastY-angleY)/interval
-	
+	pidY=kpY*(goalY-angleY)+kiY*(lastAngleY-angleY)*interval+kdY*(lastAngleY-angleY)/interval
+	lastAngleX=angleX
+	lastAngleY=angleY
 	lastTime=time.time()
 	return pidX,pidY
 def transform(value):
