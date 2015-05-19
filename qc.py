@@ -50,10 +50,10 @@ def calculate(goalX,goalY):
 	gx,gy,gz=get_gyro_rate()
 	acX=getX()
 	acY=getY()
-	angleX=0.98*(angleX+gx*(interval/1000.0))+0.02*acX
-	angleY=0.98*(angleY+gy*(interval)/1000.0)+0.02*acY
+	angleX=0.98*(angleX+gx*interval)+0.02*acX
+	angleY=0.98*(angleY+gy*interval)+0.02*acY
 	#angleY+=gy*(interval/1000.0)
-	print("Angle X:"+str(angleX))
+	print("Angle Y:"+str(transform(angleY)))
 	
 	pidX=kpX*(goalX-acX)+kiX*(lastX-acX)*interval+kdX*(lastX-acX)/interval
 	#pidY=kpY*(goalY-acY)+kiY*(lastY-acY)*interval+kdY*(lastY-acY)/interval
